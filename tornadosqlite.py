@@ -20,7 +20,13 @@ def _execute(query):
 #Index.html
 class Main(tornado.web.RequestHandler):
     def get(self):
-        self.render("templates/index.html",title="Home")
+        user_name_cookie = self.get_secure_cookie("user_name")
+        if user_name_cookie==None:
+            name=""
+        else:
+            name="Welcome,"+str(user_name_cookie)
+        self.render("templates/index.html",title="Home",name=name)
+
 
 #insert Into Person Tabel (Sign UP)
 class AddPerson(tornado.web.RequestHandler):
@@ -64,14 +70,26 @@ class ShowPeople(tornado.web.RequestHandler):
 class Login(tornado.web.RequestHandler):
     def get(self):
         self.render('templates/login.html',title="Sign In")
-
+    
     def post(self):
         name = self.get_argument("username")
+        self.set_secure_cookie("user_name", name)
+        self.redirect("/")
         
         query = ''' select * from person where name = '%s' ''' %(name);
         print(query)
         _execute(query)
-        self.render('templates/index.html',title="Home")
+        self.render('templates/index.html',title="Home",name=str(user_name_cookie))
+
+class Logout(tornado.web.RequestHandler):
+    def get(self):
+        #self.render('templates/logout.html',title="Log Out")
+        self.clear_cookie("user_name")
+        self.redirect("/")
+        
+
+
+        
 
 
 application = tornado.web.Application([
@@ -79,8 +97,9 @@ application = tornado.web.Application([
     (r"/signup" ,AddPerson),
     (r"/login",Login),
     (r"/show",ShowPeople),
+    (r"/logout",Logout)
 ],debug=True,
-static_path='static')
+static_path='static', cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo=")
 
 if __name__ == "__main__":
     application.listen(8000)
