@@ -1,4 +1,3 @@
-{%import re%}
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,6 +7,7 @@
   <script src={{static_url("Scripts/bootstrap.min.js")}}></script>
   <link rel="stylesheet" href="{{static_url('Content/bootstrap.css')}}">
   <link rel="stylesheet" type="text/css" href="{{static_url('Content/mystyle.css')}}">
+
 </head>
 <body>
   <div class="container">
@@ -28,8 +28,8 @@
               <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                   <ul class="nav navbar-nav">
                       <li><a href="/">Home <span class="sr-only">(current)</span></a></li>
-                      <li class="active"><a href="/group">Groups</a></li>
-                      <li ><a href="/people">People</a></li>
+                      <li><a href="/group">Groups</a></li>
+                      <li class="active"><a href="/people">People</a></li>
                       <!-- <li ><a href="/pchat">Chat</a></li> -->
                   </ul>
                   <ul class="nav navbar-nav navbar-right" >
@@ -51,35 +51,26 @@
   </div>
   <section>
   <div class="container">
-     <div class="row" id="test" style="margin-top: -100px;">
-            <form  action="/createG" method="post">
-              <input type="text" name="createGroup" id="createGroup">
-              <input type="submit" class="btn btn-primary" value="Create Group">
-            </form>
-          </div>
-      <h2 style="color:purple"> My Groups</h2>
+      <a class="btn btn-success add" href="/pchat">Chat with Friends</a>
+          <h2 style="color:purple"> My Friends</h2>
          <hr />
         <div class="row" id="test" style="margin-top: -100px;">
 
-    {% if name != "" %}
-        {% for group in groupsP %}
+                {% if name != "" %}
+                    {% for friend in friendsP %}
 
+                            <form action="/remove" method=POST >
+                              <div class="form-group">
+                                <div class="col-lg-4 col-lg-pull-2 col-sm-4 col-xs-4">
 
-      <form action="/leave" method=POST >
-        <div class="form-group">
-          <div class="col-lg-4 col-lg-pull-2 col-sm-4 col-xs-4">
+                                    <h2 class="text-primary">{{friend}} </h2>
+                                    <img class="img-thumbnail" src="{{static_url('images/1.jpeg')}}" >
+                                     <input type="hidden"  id="friendtodelete" value="{{friend}}"  name="friendtodelete" >
 
-                <h2 class="text-primary">{{group}}</h2>
-                <img class="img-thumbnail" src="{{static_url('images/1.jpeg')}}" >
-                  <input type="hidden"  id="grouptoleave" value="{{group}}"  name="grouptoleave" >
-
-            <input type="submit"  class="btn btn-warning add" value="leave"></input>
-            <a class="btn btn-success add" href="/chat?startchat={{re.sub('[^A-Za-z]+','',group)}}">Chat</a>
-
-              </div>
-            </div>
-        </form>
-
+                                <input type="submit" class="btn btn-primary add" value="remove"></input>
+                              </div>
+                              </div>
+                            </form>
 
                     {% end %}
                 {% end %}
@@ -89,35 +80,29 @@
 
 
             <hr />
-              <h2 style="color:purple"> All Groups</h2>
-
+            <h2 style="color:purple"> All Friends</h2>
             <hr />
-        <div class="row" id="test" style="margin-top: -100px;">
-
+      <div class="row" id="test" style="margin-top: -100px;">
 
                 <!-- All Friends -->
                 <!-- <hr /> -->
 
                 {% if name != "" %}
-                    {% for group in allGroups %}
+                    {% for friend in allFriends %}
 
-                        <!-- <div  class="groups_box"> -->
 
-                        <form action="/joinG" method=POST >
-                                <div class="form-group">
-                                  <div class="col-lg-4 col-lg-pull-2 col-sm-4 col-xs-4">
-                                  <h2 class="text-primary">{{group}} </h2>
-                                  <img class="img-thumbnail" src="{{static_url('images/1.jpeg')}}" >
-                                  <input type="hidden"  id="grouptojoin" value="{{group}}"  name="grouptojoin" >
+                            <form action="/join" method=POST >
+                              <div class="form-group">
+                                <div class="col-lg-4 col-lg-pull-2 col-sm-4 col-xs-4">
+                                    <h2 class="text-primary">{{friend}} </h2>
+                                    <img class="img-thumbnail" src="{{static_url('images/1.jpeg')}}" >
+                                      <input type="hidden"  id="friendtojoin" value="{{friend}}"  name="friendtojoin" >
 
-                              <input type="submit" class="btn btn-info add" value="join"></input>
-                                </div>
+                                <input type="submit" class="btn btn-primary add" value="add Friend">
                               </div>
+                              </div>
+                            </form>
 
-                          </form>
-
-
-                        <!-- </div> -->
                     {% end %}
                 {% end %}
             </div>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+   <head>
+       <meta charset="utf-8">
+       <title>{{title}}</title>
+       <script src={{static_url("Scripts/jquery-1.9.1.min.js")}}></script>
+       <script src={{static_url("Scripts/bootstrap.min.js")}}></script>
+       <link rel="stylesheet" href="{{static_url('Content/bootstrap.css')}}">
+       <link rel="stylesheet" type="text/css" href="{{static_url('Content/mystyle.css')}}">
+       <style >
+         h1{
+           color: purple;
+         }
+         #chatDiv{
+           border:2px solid purple;
+           height:200px;
+           width:500px;
+
+         }
+       </style>
+  <script type="text/javascript" src='{{static_url("Scripts/jquery.js")}}'></script>
+  <script type="text/javascript">
+    var webSocket;
+    var code=[0,1,2];
+    var myName="unknown Person";
+
+    $(function(){
+      webSocket=new WebSocket("ws://localhost:8000/ws");
+      webSocket.onmessage=function(e){
+
+        var receivedMessage=JSON.parse(e.data);
+
+        if (receivedMessage["code"]!=2) {
+          $("#chatDiv").append("<p>"+receivedMessage+"</p>");
+        }
+        else {
+
+          $("#clientsList").html("")
+          var onlineUsers=receivedMessage["list"]
+          $("#clientsList").append("<option value='all'>all</option>")
+
+          for (var i = 0; i < onlineUsers.length; i++) {
+            if(onlineUsers[i]!=myName)
+              $("#clientsList").append("<option value='"+onlineUsers[i]+"'>"+onlineUsers[i]+"</option>")
+          }
+        }
+
+      }
+      $("#changeName").on('click',function(event) {
+        myName=$("#chooseYourName").val();
+        webSocket.send(code[0]+"/"+$("#chooseYourName").val());
+        $("#chooseYourName").val('');
+      });
+      $("#send").on('click',function(event) {
+        if ($("#online-clients").val()=="all") {
+          webSocket.send(code[1]+"/"+$("#message").val());
+          $("#message").val("");
+        }
+        else{
+          webSocket.send(code[2]+"/"+$("#message").val()+"/"+$("#clientsList").val());
+          $("#chatDiv").append("<p>"+"Private Message To: "+$("#clientsList").val()+"<br>"+myName+": "+$("#message").val()+"</p>");
+          $("#message").val("");
+        }
+
+      });
+    })
+  </script>
+</head>
+<body>
+
+    <div class="container">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                 <!-- Brand and toggle get grouped for better mobile display  -->
+                 <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">Chat Game</a>
+                </div>
+
+               <!-- Collect the nav links, forms, and other content for toggling  -->
+                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li ><a href="/">Home <span class="sr-only">(current)</span></a></li>
+                        {% if name != "" %}
+                        <li><a href="/group">Groups</a></li>
+                        <li><a href="/people">People</a></li>
+                        <!-- <li class="active"><a href="/pchat">ChatFriend</a></li> -->
+                        {% end %}
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right" >
+                      {% if name == "" %}
+                      <li><a href="/login"><span class="glyphicon glyphicon-user"></span> Login</a></li>
+                      <li><a href="/signup"><span class="glyphicon glyphicon-user"></span> Register</a></li>
+                      {% end %}
+                      {% if name != "" %}
+                      <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"></span> {{name}} <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                         <li><a href="/logout"><i class="icon-off"></i> Logout</a></li>
+                        </ul>
+                      </li>
+                     {% end %}
+                    </ul>
+                </div>
+            </div>
+         </nav>
+    </div>
+<section>
+<div class="container">
+{% if name != "" %}
+<p>online user name display</p>
+
+<p>offline user name display unknown</p>
+<br/>
+<br/>
+<!-- <label for="chooseYourName">Choose your Name:</label> -->
+ <input type="hidden" id="chooseYourName" value={{name}}>
+<input type="button" id="changeName" class="btn btn-primary" value="online">
+<br><br>
+<div id="chatDiv"></div>
+<br>
+<input type="text" id="message">
+<select id="clientsList"></select>
+<input type="button" id="send" class="btn btn-primary" value="send">
+{% end %}
+</div>
+
+</body>
+</html>
